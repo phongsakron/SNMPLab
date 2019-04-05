@@ -1,0 +1,58 @@
+from multiping import MultiPing
+from multiping import multi_ping
+import time
+import datetime
+
+waitTime = 5 # sec
+alertTime = 1 # minite
+# Create a MultiPing object to test three hosts / addresses
+addrs = ["10.1.1.1","10.2.2.2","10.3.3.3","127.0.0.1"]
+mp = MultiPing(addrs)
+
+a = {}
+
+for i in addrs:
+    a[i] = 0
+print(a)
+
+#print(a.get("192.168.1.8"))
+# Send the pings to those addresses
+#mp.send()
+
+# With a 1 second timout, wait for responses (may return sooner if all
+# results are received).
+#responses, no_responses = mp.receive(0.1)
+
+#print("Respones : " , responses)
+#print("Norespones : ",no_responses)
+try:
+    while True:
+        time.sleep(waitTime) #wait X sec to do next
+        print("DATE : ",datetime.datetime.now())
+        mp = MultiPing(addrs)
+        mp.send()
+        responses, no_responses = mp.receive(0.1) # delect before input new one
+        print("Respones : " , responses)
+        print("Norespones : ",no_responses)
+        alert = False
+        print("Stack : ",a) # For Debug
+        for i in a:
+            if a.get(i) >= (alert*60)/waitTime:
+                alert = True
+        
+        if alert == True:
+            for i in a:
+                if a.get(i) >= (alert*60)/waitTime:
+                    print("*****ALERT***** " , i , " has Down")
+        if no_responses: #if no_re have value
+            for i in no_responses:
+                sum = a.get(i)
+                a[i] = sum + 1
+        else :
+            for i in responses:
+                a[i] = 0
+        
+        print("---------------------------------------------")
+except KeyboardInterrupt:
+    pass
+
